@@ -1,14 +1,15 @@
 @echo off
-setlocal
-chcp 65001 >nul
-title å¾®è½¯åº”ç”¨å•†åº—å…¨èƒ½ä¿®å¤å·¥å…· (ä¸“ä¸šæ——èˆ°ç‰ˆ)
+setlocal EnableExtensions
+chcp 936 >nul
+title Î¢ÈíÓ¦ÓÃÉÌµêÈ«ÄÜÐÞ¸´¹¤¾ß v3.0 (×¨ÒµÆì½¢°æ)
 
 :: ====================================================================
-:: 1. ç®¡ç†å‘˜æƒé™è‡ªåŠ¨æ£€æµ‹ä¸Žç”³è¯· (UAC è‡ªææƒ)
+:: 1. ¹ÜÀíÔ±È¨ÏÞ×Ô¶¯¼ì²âÓëÉêÇë (UAC ×ÔÌáÈ¨£¬¼æÈÝÖÐÎÄ/¿Õ¸ñ/ÌØÊâ×Ö·ûÂ·¾¶)
 :: ====================================================================
 fltmc >nul 2>&1 || (
-    echo [æç¤º] æ­£åœ¨èŽ·å–ç®¡ç†å‘˜æƒé™ï¼Œè¯·åœ¨å¼¹å‡ºçš„UACçª—å£ä¸­ç‚¹å‡»â€œæ˜¯â€...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
+    echo [ÌáÊ¾] ÕýÔÚ»ñÈ¡¹ÜÀíÔ±È¨ÏÞ£¬ÇëÔÚµ¯³öµÄ UAC ´°¿ÚÖÐµã»÷¡°ÊÇ¡±...
+    set "SELF=%~f0"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath $env:SELF -Verb RunAs"
     exit /b
 )
 cd /d "%~dp0"
@@ -16,49 +17,51 @@ cd /d "%~dp0"
 cls
 color 0b
 echo ====================================================================
-echo          å¾®è½¯åº”ç”¨å•†åº—å…¨èƒ½ä¿®å¤å·¥å…· (ä¸“ä¸šæ——èˆ°ç‰ˆ / å…¨ç³»ç»Ÿè‡ªé€‚åº”)
+echo        Î¢ÈíÓ¦ÓÃÉÌµêÈ«ÄÜÐÞ¸´¹¤¾ß v3.0 (×¨ÒµÆì½¢°æ / È«ÏµÍ³×ÔÊÊÓ¦)
 echo ====================================================================
-echo  é€‚ç”¨åœºæ™¯: æ— æ³•æ›´æ–° / ä¸‹è½½å¡åœ¨0% / é”™è¯¯ä»£ç  0x80... / éƒ¨ç½²é˜Ÿåˆ—å µå¡ž
-echo  æ‰§è¡Œæ—¶é—´: çº¦ 5-10 ç§’ï¼Œæ— éœ€ç­‰å¾…30åˆ†é’Ÿï¼Œæ— éœ€é‡å¯ç”µè„‘ï¼Œå®Œå…¨å¼€æºé€æ˜Ž
+echo  ÊÊÓÃ³¡¾°: ÎÞ·¨¸üÐÂ / ÏÂÔØ¿¨0%% / ´íÎó´úÂë 0x80... / ²¿Êð¶ÓÁÐ¶ÂÈû
+echo            Ó¦ÓÃ¸üÐÂ·´¸´Ê§°Ü (0x80073CFB) / MSN ×ÊÑ¶ÎÞ·¨¸üÐÂ
+echo  Ö´ÐÐÊ±¼ä: Ô¼ 10-15 Ãë£»Èô´¥·¢ MSN ×ÊÑ¶ÖØ×°£¬Ô¼ 30-60 Ãë
+echo  ÎÞÐèÖØÆô£¬ÍêÈ«¿ªÔ´Í¸Ã÷£¬ÐÞÍê¼´×ß£¬ÁãºóÌ¨³£×¤
 echo ====================================================================
 echo.
 
 :: ====================================================================
-:: 2. æ³¨é”€æ—§ç‰ˆåŽå°è½®è¯¢è®¡åˆ’ä»»åŠ¡ (æœç»åŽå°å¸¸é©»å ç”¨)
+:: 2. ×¢Ïú¾É°æºóÌ¨ÂÖÑ¯¼Æ»®ÈÎÎñ (¶Å¾øºóÌ¨³£×¤Õ¼ÓÃ)
 :: ====================================================================
-echo [1/8] æ£€æŸ¥å¹¶æ¸…ç†æ—§ç‰ˆåŽå°è½®è¯¢è®¡åˆ’ä»»åŠ¡...
+echo [1/9] ¼ì²é²¢ÇåÀí¾É°æºóÌ¨ÂÖÑ¯¼Æ»®ÈÎÎñ...
 schtasks /delete /tn "MicrosoftStoreHealthCheck" /f >nul 2>&1
-echo       [OK] åŽå°ä»»åŠ¡å·²æ¸…ç†ï¼Œé›¶åŽå°å¸¸é©»
+echo       [OK] ºóÌ¨ÈÎÎñÒÑÇåÀí£¬ÁãºóÌ¨³£×¤
 
 :: ====================================================================
-:: 3. å½»åº•é‡Šæ”¾å ç”¨è¿›ç¨‹ (æ”»å…‹ 0x80073D02 éƒ¨ç½²å†²çª)
+:: 3. ³¹µ×ÊÍ·ÅÕ¼ÓÃ½ø³Ì (¹¥¿Ë 0x80073D02 ²¿Êð³åÍ»)
 :: ====================================================================
-echo [2/8] æ­£åœ¨é‡Šæ”¾æŒ‚èµ·æˆ–å ç”¨å®‰è£…é€šé“çš„å…¨éƒ¨è¿›ç¨‹...
+echo [2/9] ÕýÔÚÊÍ·Å¹ÒÆð»òÕ¼ÓÃ°²×°Í¨µÀµÄÈ«²¿½ø³Ì...
 taskkill /f /im WinStore.App.exe >nul 2>&1
 taskkill /f /im winget.exe >nul 2>&1
 taskkill /f /im AppInstaller.exe >nul 2>&1
 taskkill /f /im WindowsPackageManagerServer.exe >nul 2>&1
 taskkill /f /im StorePurchaseApp.exe >nul 2>&1
 taskkill /f /im WWAHost.exe >nul 2>&1
-echo       [OK] å•†åº—ä¸Žå®‰è£…å™¨è¿›ç¨‹é”å·²å½»åº•é‡Šæ”¾
+echo       [OK] ÉÌµêÓë°²×°Æ÷½ø³ÌËøÒÑ³¹µ×ÊÍ·Å
 
 :: ====================================================================
-:: 4. ç»„ç­–ç•¥ä¸Žæ³¨å†Œè¡¨é™åˆ¶ç­–ç•¥æ·±åº¦æ¸…ç† (è§£å†³ 0x80070422 ç¦ç”¨é™åˆ¶)
+:: 4. ×é²ßÂÔÓë×¢²á±íÏÞÖÆ²ßÂÔÉî¶ÈÇåÀí (½â¾ö 0x80070422 ½ûÓÃÏÞÖÆ)
 :: ====================================================================
-echo [3/8] æ­£åœ¨æ£€æµ‹å¹¶è§£é™¤æ³¨å†Œè¡¨/ç»„ç­–ç•¥ç¦ç”¨é™åˆ¶...
+echo [3/9] ÕýÔÚ¼ì²â²¢½â³ý×¢²á±í/×é²ßÂÔ½ûÓÃÏÞÖÆ...
 reg delete "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /f >nul 2>&1
 reg delete "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v "DisableStoreApps" /f >nul 2>&1
 reg delete "HKCU\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /f >nul 2>&1
 reg delete "HKCU\SOFTWARE\Policies\Microsoft\WindowsStore" /v "DisableStoreApps" /f >nul 2>&1
-echo       [OK] åº”ç”¨å•†åº—æ³¨å†Œè¡¨ç­–ç•¥é™åˆ¶å·²å®Œå…¨æ”¾è¡Œ
+echo       [OK] Ó¦ÓÃÉÌµê×¢²á±í²ßÂÔÏÞÖÆÒÑÍêÈ«·ÅÐÐ
 
 :: ====================================================================
-:: 5. æ ¸å¿ƒç³»ç»ŸæœåŠ¡å¿«é€Ÿé…ç½®ä¸Žå¯åŠ¨
+:: 5. ºËÐÄÏµÍ³·þÎñ¿ìËÙÅäÖÃÓëÆô¶¯ (±£ÁôÏµÍ³Ä¬ÈÏÆô¶¯ÀàÐÍ)
 :: ====================================================================
-echo [4/8] æ­£åœ¨æ™ºèƒ½è¯Šæ–­å¹¶æ¢å¤å…³é”®ç³»ç»Ÿæ ¸å¿ƒæœåŠ¡...
-sc config wuauserv start= auto >nul 2>&1
+echo [4/9] ÕýÔÚÖÇÄÜÕï¶Ï²¢»Ö¸´¹Ø¼üÏµÍ³ºËÐÄ·þÎñ...
+sc config wuauserv start= demand >nul 2>&1
 sc start wuauserv >nul 2>&1
-sc config bits start= auto >nul 2>&1
+sc config bits start= demand >nul 2>&1
 sc start bits >nul 2>&1
 sc config cryptsvc start= auto >nul 2>&1
 sc start cryptsvc >nul 2>&1
@@ -68,14 +71,19 @@ sc config InstallService start= demand >nul 2>&1
 sc start InstallService >nul 2>&1
 sc config ClipSVC start= demand >nul 2>&1
 sc start ClipSVC >nul 2>&1
-sc config w32time start= auto >nul 2>&1
+sc config w32time start= demand >nul 2>&1
 sc start w32time >nul 2>&1
-echo       [OK] æ ¸å¿ƒç³»ç»ŸæœåŠ¡å…¨éƒ¨é…ç½®å°±ç»ª
+echo       [OK] ºËÐÄÏµÍ³·þÎñÈ«²¿ÅäÖÃ¾ÍÐ÷
 
 :: ====================================================================
-:: 6. ä¸‹è½½æŸåç¼“å­˜ä¸Žäº¤ä»˜ä¼˜åŒ–ç¼“å­˜æžé€Ÿæ¸…ç©º (è§£å†³ 0x80073CF0 / 0x80070002)
+:: 6. ÏÂÔØËð»µ»º´æÓë½»¸¶ÓÅ»¯»º´æ¼«ËÙÇå¿Õ (½â¾ö 0x80073CF0 / 0x80070002)
+::    ÏÈÍ£·þÎñÔÙÉ¾Ä¿Â¼£¬±ÜÃâÎÄ¼þ±»Õ¼ÓÃµ¼ÖÂ¡°¼ÙÇåÀí¡±
 :: ====================================================================
-echo [5/8] æ­£åœ¨æžé€Ÿæ¸…ç†æŸåçš„ä¸´æ—¶ä¸‹è½½åŒ…ä¸Žäº¤ä»˜ä¼˜åŒ–ç¼“å­˜...
+echo [5/9] ÕýÔÚ¼«ËÙÇåÀíËð»µµÄÁÙÊ±ÏÂÔØ°üÓë½»¸¶ÓÅ»¯»º´æ...
+sc stop wuauserv >nul 2>&1
+sc stop bits >nul 2>&1
+sc stop dosvc >nul 2>&1
+ping -n 3 127.0.0.1 >nul
 if exist "%windir%\SoftwareDistribution\Download" (
     rd /s /q "%windir%\SoftwareDistribution\Download" >nul 2>&1
     md "%windir%\SoftwareDistribution\Download" >nul 2>&1
@@ -83,50 +91,93 @@ if exist "%windir%\SoftwareDistribution\Download" (
 powershell -NoProfile -Command "try { Delete-DeliveryOptimizationCache -Force -ErrorAction SilentlyContinue | Out-Null } catch {}" >nul 2>&1
 if exist "%windir%\SoftwareDistribution.old" rd /s /q "%windir%\SoftwareDistribution.old" >nul 2>&1
 if exist "%windir%\System32\catroot2.old" rd /s /q "%windir%\System32\catroot2.old" >nul 2>&1
-echo       [OK] ä¸´æ—¶ä¸‹è½½ç¼“å­˜ä¸Žéƒ¨ç½²é”å·²å½»åº•æ¸…ç†
+sc start wuauserv >nul 2>&1
+sc start bits >nul 2>&1
+sc start dosvc >nul 2>&1
+echo       [OK] ÁÙÊ±ÏÂÔØ»º´æÓë²¿ÊðËøÒÑ³¹µ×ÇåÀí
 
 :: ====================================================================
-:: 7. è§£é™¤ AppX åº”ç”¨éƒ¨ç½²é˜Ÿåˆ—æ­»é” (è§£å†³å¡åœ¨ 0% / æŒ‚èµ·é˜Ÿåˆ—)
+:: 7. ½â³ý AppX Ó¦ÓÃ²¿Êð¶ÓÁÐËÀËø (½â¾ö¿¨ÔÚ 0%% / ¹ÒÆð¶ÓÁÐ)
 :: ====================================================================
-echo [6/8] æ­£åœ¨æŽ¢æµ‹å¹¶è§£é™¤å¡æ­»çš„ AppX åº”ç”¨éƒ¨ç½²é˜Ÿåˆ—...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$bad = @(Get-AppxPackage | Where-Object { $_.Status -match 'DeploymentInProgress|InstallInProgress|PackageInProgress' -or $_.Status -ne 'Ok' }); if ($bad.Count -gt 0) { foreach ($p in $bad) { Write-Host ('   [!] å‘çŽ°å¡æ­»åº”ç”¨: ' + $p.Name + 'ï¼Œæ­£åœ¨é‡ç½®...'); try { Reset-AppxPackage -Package $p.PackageFullName -ErrorAction Stop; Write-Host ('   [OK] æˆåŠŸé‡ç½®: ' + $p.Name) } catch {} } }"
-echo       [OK] éƒ¨ç½²é˜Ÿåˆ—ç•…é€šï¼Œæ— é˜»å¡žåº”ç”¨åŒ…
+echo [6/9] ÕýÔÚÌ½²â²¢½â³ý¿¨ËÀµÄ AppX Ó¦ÓÃ²¿Êð¶ÓÁÐ...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "if([Environment]::OSVersion.Version.Build -ge 22000){ $bad=@(Get-AppxPackage | Where-Object { $_.Status -ne 'Ok' }); if($bad.Count -gt 0){ foreach($p in $bad){ Write-Host ('   [!] ·¢ÏÖ¿¨ËÀÓ¦ÓÃ: ' + $p.Name + '£¬ÕýÔÚÖØÖÃ...'); try { Reset-AppxPackage -Package $p.PackageFullName -ErrorAction Stop; Write-Host ('   [OK] ³É¹¦ÖØÖÃ: ' + $p.Name) } catch {} } } } else { Write-Host '   [i] Windows 10 »·¾³£¬Ìø¹ý Windows 11 ×¨ÊôÖØÖÃ¹¦ÄÜ' }"
+echo       [OK] ²¿Êð¶ÓÁÐ¼ì²éÍê³É
 
 :: ====================================================================
-:: 8. ç½‘ç»œä»£ç†é‡ç½®ã€TLS 1.2/1.3 å¯ç”¨ä¸Ž UWP å›žçŽ¯è±å… (è§£å†³ 0x80131500 / 0x80072EFD)
+:: 8. ÍøÂç´úÀíÖØÖÃ¡¢TLS 1.2/1.3 ÆôÓÃÓë UWP »Ø»·»íÃâ (½â¾ö 0x80131500 / 0x80072EFD)
 :: ====================================================================
-echo [7/8] æ­£åœ¨é‡ç½®ç½‘ç»œä»£ç†ã€åˆ·æ–° DNSã€é…ç½® TLS ä¸Žæ³¨å…¥å›žçŽ¯è±å…...
+echo [7/9] ÕýÔÚÖØÖÃÍøÂç´úÀí¡¢Ë¢ÐÂ DNS¡¢ÅäÖÃ TLS Óë×¢Èë»Ø»·»íÃâ...
 netsh winhttp reset proxy >nul 2>&1
 ipconfig /flushdns >nul 2>&1
 w32tm /resync /nowait >nul 2>&1
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v "SecureProtocols" /t REG_DWORD /d 10240 /f >nul 2>&1
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$pkg = Get-AppxPackage -Name 'Microsoft.WindowsStore' -ErrorAction SilentlyContinue; if ($pkg) { CheckNetIsolation.exe LoopbackExempt -a \"-n=$($pkg.PackageFamilyName)\" >nul 2>&1 }"
-echo       [OK] ç½‘ç»œä»£ç†å·²é‡ç½®ï¼ŒTLS åè®®å·²æ ¡å‡†ï¼Œå·²æŽˆäºˆæœ¬åœ°å›žçŽ¯å…é™¤
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$pkg=Get-AppxPackage -Name 'Microsoft.WindowsStore' -ErrorAction SilentlyContinue; if($pkg){ CheckNetIsolation.exe LoopbackExempt -a ('-n=' + $pkg.PackageFamilyName) | Out-Null }"
+echo       [OK] ÍøÂç´úÀíÒÑÖØÖÃ£¬TLS Ð­ÒéÒÑÐ£×¼£¬ÒÑÊÚÓè±¾µØ»Ø»·Ãâ³ý
 
 :: ====================================================================
-:: 9. åº”ç”¨å•†åº—æ ¸å¿ƒç»„ä»¶ä¸‰çº§æ™ºèƒ½æ‰˜åº•é‡æ–°æ³¨å†Œ
+:: 9. Ó¦ÓÃÉÌµêºËÐÄ×é¼þÈý¼¶ÖÇÄÜÍÐµ×ÖØÐÂ×¢²á
+::    Ò»¼¶: µ±Ç°ÓÃ»§Çåµ¥ÖØ×¢²á£»¶þ¼¶: WindowsApps ÎïÀíÉ¨Ãè¶µµ×£»
+::    Èý¼¶: wsreset -i ÔÚÏßÀ­»Ø (½öµ±ÉÌµê×é¼þÈ±Ê§Ê±´¥·¢)
 :: ====================================================================
-echo [8/8] æ­£åœ¨é‡æ–°æ³¨å†Œåº”ç”¨å•†åº—æ ¸å¿ƒç»„ä»¶ (ä¸‰çº§æ‰˜åº•é˜²æŠ¤)...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$core = @('Microsoft.WindowsStore', 'Microsoft.StorePurchaseApp', 'Microsoft.DesktopAppInstaller'); foreach ($n in $core) { Get-AppxPackage -Name $n -ErrorAction SilentlyContinue | ForEach-Object { $m = Join-Path $_.InstallLocation 'AppXManifest.xml'; if (Test-Path $m) { Add-AppxPackage -DisableDevelopmentMode -Register $m -ErrorAction SilentlyContinue } } }"
-echo       [OK] å¾®è½¯å•†åº—åŠå…³è”å®‰è£…ç»„ä»¶é‡æ–°æ³¨å†Œå®Œæˆ
+echo [8/9] ÕýÔÚÖØÐÂ×¢²áÓ¦ÓÃÉÌµêºËÐÄ×é¼þ (Èý¼¶ÍÐµ×·À»¤)...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$core=@('Microsoft.WindowsStore','Microsoft.StorePurchaseApp','Microsoft.DesktopAppInstaller'); foreach($n in $core){ Get-AppxPackage -Name $n -ErrorAction SilentlyContinue | ForEach-Object { $m=Join-Path $_.InstallLocation 'AppXManifest.xml'; if(Test-Path $m){ Add-AppxPackage -DisableDevelopmentMode -Register $m -ErrorAction SilentlyContinue } } }; $s=Get-AppxPackage -Name 'Microsoft.WindowsStore' -ErrorAction SilentlyContinue; if(-not $s){ $d=Get-ChildItem (Join-Path $env:ProgramFiles 'WindowsApps') -Directory -Filter 'Microsoft.WindowsStore_*' -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1; if($d){ $m=Join-Path $d.FullName 'AppxManifest.xml'; if(Test-Path $m){ Add-AppxPackage -DisableDevelopmentMode -Register $m -ErrorAction SilentlyContinue } } }; $s=Get-AppxPackage -Name 'Microsoft.WindowsStore' -ErrorAction SilentlyContinue; if(-not $s){ Write-Host '   [!] ÉÌµê×é¼þÈ±Ê§£¬ÕýÔÚµ÷ÓÃ wsreset -i ÔÚÏßÀ­»Ø...'; Start-Process wsreset.exe -ArgumentList '-i' -Wait }"
+echo       [OK] Î¢ÈíÉÌµê¼°¹ØÁª°²×°×é¼þÖØÐÂ×¢²áÍê³É
 
 :: ====================================================================
-:: 10. æœ€ç»ˆå¥åº·è¯Šæ–­æŠ¥å‘Š
+:: 10. MSN ×ÊÑ¶¸üÐÂ³åÍ»ÐÞ¸´ (0x80073CFB)
+::     ½öÔÚ¼ì²âµ½¡°Í¬±êÊ¶¾É°ü³åÍ» / Ëð»µÔÝ´æ°ü / Ö»Ê£ 1.x ¿Õ¿Ç¡±Ê±´¥·¢
+:: ====================================================================
+echo [9/9] ÕýÔÚ¼ì²é MSN ×ÊÑ¶¸üÐÂ³åÍ» (0x80073CFB)...
+set "MSN_NEED=0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$bad=@(Get-ChildItem (Join-Path $env:ProgramFiles 'WindowsApps') -Directory -Filter 'Microsoft.BingNews_*' -ErrorAction SilentlyContinue | Where-Object { -not (Test-Path (Join-Path $_.FullName 'AppxManifest.xml')) -and -not (Test-Path (Join-Path $_.FullName 'AppxMetadata\AppxBundleManifest.xml')) }); $pkg=Get-AppxPackage -Name 'Microsoft.BingNews' -ErrorAction SilentlyContinue | Sort-Object Version -Descending | Select-Object -First 1; $stub=$false; if($pkg -and ([version]$pkg.Version -lt [version]'4.0.0.0')){ $stub=$true }; if($bad.Count -gt 0 -or $stub){ exit 10 }; exit 0"
+if errorlevel 10 set "MSN_NEED=1"
+if "%MSN_NEED%"=="0" goto :msn_skip
+echo       [!] ¼ì²âµ½ MSN ×ÊÑ¶Ëð»µ»ò°æ±¾³åÍ»£¬¿ªÊ¼×Ô¶¯ÇåÀí²¢ÖØ×°...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='SilentlyContinue'; Get-Process -Name 'Microsoft.Msn.News' | Stop-Process -Force; Get-AppxPackage -AllUsers -Name 'Microsoft.BingNews' | ForEach-Object { Remove-AppxPackage -Package $_.PackageFullName -AllUsers }; Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq 'Microsoft.BingNews' } | ForEach-Object { Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName }; Get-ChildItem (Join-Path $env:ProgramFiles 'WindowsApps') -Directory -Filter 'Microsoft.BingNews_*' | ForEach-Object { takeown /f $_.FullName /r /d y | Out-Null; icacls $_.FullName /grant '*S-1-5-32-544:(OI)(CI)F' /t /c | Out-Null; Remove-Item -LiteralPath $_.FullName -Recurse -Force }; Restart-Service AppXSvc -Force"
+echo       [OK] ³åÍ»°üÓëËð»µÔÝ´æÄ¿Â¼ÒÑÇåÀí£¬ÕýÔÚÒÔµ±Ç°ÓÃ»§Éí·Ý´ÓÉÌµêÖØÐÂ°²×°...
+set "MSNDIR=%ProgramData%\MicrosoftStoreRepairTool"
+if not exist "%MSNDIR%" md "%MSNDIR%" >nul 2>&1
+del "%MSNDIR%\msn-result.txt" >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$d=Join-Path $env:ProgramData 'MicrosoftStoreRepairTool'; if(-not (Test-Path $d)){ New-Item -ItemType Directory -Path $d -Force | Out-Null }; $ps=@('winget install --id 9WZDNCRFHVFW --source msstore --accept-package-agreements --accept-source-agreements --disable-interactivity --force *> (Join-Path $PSScriptRoot msn-install.log)','$LASTEXITCODE | Set-Content (Join-Path $PSScriptRoot msn-result.txt)'); Set-Content -Path (Join-Path $d 'msn-install.ps1') -Value $ps -Encoding ASCII; $bat=@('@echo off',('powershell -NoProfile -ExecutionPolicy Bypass -File ' + (Join-Path $d 'msn-install.ps1'))); Set-Content -Path (Join-Path $d 'msn-install.cmd') -Value $bat -Encoding ASCII"
+explorer.exe "%MSNDIR%\msn-install.cmd"
+for /l %%i in (1,1,60) do (
+    if exist "%MSNDIR%\msn-result.txt" goto :msn_check
+    ping -n 3 127.0.0.1 >nul
+)
+:msn_check
+set "MSNCODE="
+if exist "%MSNDIR%\msn-result.txt" set /p MSNCODE=<"%MSNDIR%\msn-result.txt"
+if "%MSNCODE%"=="0" goto :msn_ok
+echo       [!] ×Ô¶¯°²×°Î´Íê³É£¬ÕýÔÚ´ò¿ªÉÌµê°²×°Ò³£¬Çëµã»÷¡°»ñÈ¡/°²×°¡±...
+start "" ms-windows-store://pdp/?ProductId=9WZDNCRFHVFW
+goto :msn_end
+:msn_ok
+echo       [OK] MSN ×ÊÑ¶ÒÑ´ÓÉÌµêÖØÐÂ°²×°Íê³É
+goto :msn_end
+:msn_skip
+echo       [OK] Î´¼ì²âµ½ MSN ×ÊÑ¶³åÍ»£¬Ìø¹ýÖØ×°
+:msn_end
+
+:: ====================================================================
+:: 11. ×îÖÕ½¡¿µÕï¶Ï±¨¸æ
 :: ====================================================================
 echo.
 echo ====================================================================
-echo                   æœ€ç»ˆå¥åº·è¯Šæ–­æŠ¥å‘Š
+echo                   ×îÖÕ½¡¿µÕï¶Ï±¨¸æ
 echo ====================================================================
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$s = Get-AppxPackage -Name 'Microsoft.WindowsStore'; if ($s -and $s.Status -eq 'Ok') { Write-Host ('  [OK] å¾®è½¯å•†åº—ç»„ä»¶: æ­£å¸¸å°±ç»ª (ç‰ˆæœ¬: ' + $s.Version + ')') -ForegroundColor Green } else { Write-Host '  [!] å¾®è½¯å•†åº—ç»„ä»¶æœªæ£€æµ‹åˆ°æˆ–çŠ¶æ€å¼‚å¸¸' -ForegroundColor Yellow }"
-echo   [OK] æ ¸å¿ƒç³»ç»ŸæœåŠ¡: å…¨éƒ¨å¤„äºŽæ­£å¸¸è¿è¡ŒçŠ¶æ€
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$s=Get-AppxPackage -Name 'Microsoft.WindowsStore' -ErrorAction SilentlyContinue; if($s -and $s.Status -eq 'Ok'){ Write-Host ('  [OK] Î¢ÈíÉÌµê×é¼þ: Õý³£¾ÍÐ÷ (°æ±¾: ' + $s.Version + ')') -ForegroundColor Green } else { Write-Host '  [!] Î¢ÈíÉÌµê×é¼þÎ´¼ì²âµ½»ò×´Ì¬Òì³£' -ForegroundColor Yellow }; $n=Get-AppxPackage -Name 'Microsoft.BingNews' -ErrorAction SilentlyContinue | Sort-Object Version -Descending | Select-Object -First 1; if($n -and $n.Status -eq 'Ok'){ Write-Host ('  [OK] MSN ×ÊÑ¶×é¼þ: Õý³£¾ÍÐ÷ (°æ±¾: ' + $n.Version + ')') -ForegroundColor Green } elseif($n){ Write-Host '  [!] MSN ×ÊÑ¶×é¼þ×´Ì¬Òì³£' -ForegroundColor Yellow } else { Write-Host '  [i] Î´°²×° MSN ×ÊÑ¶£¬¿ÉÔÚÉÌµêËÑË÷°²×°' }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$svc=@('AppXSvc','ClipSVC','InstallService','StateRepository','cryptsvc','wuauserv'); $bad=@(); foreach($n in $svc){ $s=Get-Service -Name $n -ErrorAction SilentlyContinue; if(-not $s -or $s.Status -ne 'Running'){ $bad+=$n } }; if($bad.Count -eq 0){ Write-Host '  [OK] ºËÐÄÏµÍ³·þÎñ: È«²¿´¦ÓÚÕý³£ÔËÐÐ×´Ì¬' -ForegroundColor Green } else { Write-Host ('  [!] ÒÔÏÂ·þÎñÎ´ÔËÐÐ: ' + ($bad -join ', ')) -ForegroundColor Yellow }"
 echo ====================================================================
 echo.
-echo ^>^>^> ä¿®å¤å…¨éƒ¨å®Œæˆï¼çŽ°åœ¨å¯ä»¥ç›´æŽ¥åŽ»å¾®è½¯å•†åº—ç‚¹å‡»â€œèŽ·å–æ›´æ–°â€æµ‹è¯• ^<^<^<
+echo ^>^>^> ÐÞ¸´È«²¿Íê³É£¡ÏÖÔÚ¿ÉÒÔÖ±½ÓÈ¥Î¢ÈíÉÌµêµã»÷¡°»ñÈ¡¸üÐÂ¡±²âÊÔ ^<^<^<
 echo.
-set /p choice="æ˜¯å¦çŽ°åœ¨ç«‹å³æ‰“å¼€å¾®è½¯åº”ç”¨å•†åº—è¿›è¡Œæµ‹è¯•ï¼Ÿ[Y/N, é»˜è®¤Y]: "
+if defined MS_REPAIR_SILENT goto :finish
+set /p choice="ÊÇ·ñÏÖÔÚÁ¢¼´´ò¿ªÎ¢ÈíÓ¦ÓÃÉÌµê½øÐÐ²âÊÔ£¿[Y/N, Ä¬ÈÏY]: "
 if /i not "%choice%"=="n" start ms-windows-store:
 
+:finish
 echo.
-echo æ“ä½œå®Œæˆï¼ŒæŒ‰ä»»æ„é”®é€€å‡º...
+echo ²Ù×÷Íê³É£¬°´ÈÎÒâ¼üÍË³ö...
+if defined MS_REPAIR_SILENT exit /b
 pause >nul
 exit /b

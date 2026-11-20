@@ -9,7 +9,7 @@ An enterprise-grade, lightning-fast, zero-resident, cross-generational auto-repa
 [![GitHub Stars](https://img.shields.io/github/stars/1837620622/MicrosoftStoreRepairTool?style=for-the-badge&logo=github&color=gold)](https://github.com/1837620622/MicrosoftStoreRepairTool)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011%20(All%20Builds)-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/1837620622/MicrosoftStoreRepairTool)
 [![Architecture](https://img.shields.io/badge/Architecture-x64%20%7C%20ARM64-00A4EF?style=for-the-badge)](https://github.com/1837620622/MicrosoftStoreRepairTool)
-[![Speed](https://img.shields.io/badge/Execution%20Time-10--15s%20Only-2ea44f?style=for-the-badge&logo=speedtest&logoColor=white)](https://github.com/1837620622/MicrosoftStoreRepairTool)
+[![Speed](https://img.shields.io/badge/Execution%20Time-10--60s%20Typical-2ea44f?style=for-the-badge&logo=speedtest&logoColor=white)](https://github.com/1837620622/MicrosoftStoreRepairTool)
 [![Zero Resident](https://img.shields.io/badge/Background%20Resident-0%25%20Clean-critical?style=for-the-badge)](https://github.com/1837620622/MicrosoftStoreRepairTool)
 [![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
@@ -43,7 +43,7 @@ Users frequently encounter frustrating issues with the Microsoft Store on Window
 
 ## 🌟 Key Features
 
-- ⚡ **Lightning Fast (10 ~ 15 Seconds)**: Accurately targets Store deployment queues and dependency chains. No wasteful full-disk scans.
+- ⚡ **Lightning Fast (10 ~ 15 Seconds, 30 ~ 60 s with MSN reinstall)**: Accurately targets Store deployment queues and dependency chains. No wasteful full-disk scans.
 - 🖥️ **Cross-Generational Auto-Adaptive**:
   - Automatically identifies Windows 10 (21H2/22H2, etc.) and Windows 11 (22H2/23H2/24H2, etc.);
   - Automatically detects system architecture (AMD64 / ARM64);
@@ -59,6 +59,10 @@ Users frequently encounter frustrating issues with the Microsoft Store on Window
   - `Tier 1`: Re-registers in the current user context;
   - `Tier 2`: Scans `WindowsApps` physical directory manifests if user registration was wiped;
   - `Tier 3`: Triggers native `wsreset.exe -i` for cloud retrieval if core binaries are missing.
+- 🩺 **MSN News Update Conflict Repair (0x80073CFB)**:
+  - Detects a corrupt staged bundle or a stub-only MSN News install (`Microsoft.BingNews`);
+  - Removes the conflicting package for every user and purges broken `WindowsApps` leftovers;
+  - Reinstalls MSN News from the Store as the signed-in user, keeping the normal proxy/network context.
 
 ---
 
@@ -77,8 +81,9 @@ flowchart TD
     Step5 --> Step6["6. Detect & Force Reset Packages Stuck in DeploymentInProgress"]
     Step6 --> Step7["7. Reset WinHTTP / Flush DNS / Enable TLS 1.2+1.3 / Inject Loopback Exempt"]
     Step7 --> Step8["8. 3-Tier Fallback Re-registration of Store Packages"]
+    Step8 --> Step9["9. Repair MSN News Update Conflict (0x80073CFB)"]
     
-    Step8 --> Report["Display Diagnostic Health Report Card"]
+    Step9 --> Report["Display Diagnostic Health Report Card"]
     Report --> Finish(["Press Enter to Open Microsoft Store and Verify"])
 ```
 
@@ -89,9 +94,10 @@ flowchart TD
 | Error Code | Trigger Scenario | Root Cause | Solution by this Tool |
 | :--- | :--- | :--- | :--- |
 | **0x80073CF0 / 0x80070002** | Download stuck at 0% or interrupted | Corrupt temporary download files or unreleased file locks | Safely empties `SoftwareDistribution\Download` using low-level non-blocking APIs |
+| **0x80073CFB** | An app update (commonly MSN News) keeps failing | A same-identity package or a corrupt staged bundle already exists | Detects the conflict, removes the broken package for all users, cleans staged leftovers and reinstalls from the Store |
 | **0x80073D02** | Fails when re-registering Store packages | `AppInstaller` or Store background workers are held by Windows | Thoroughly terminates the entire conflicting process tree |
 | **0x803F8001** | App license missing or validation error | Client License Service (`ClipSVC`) stopped or disabled | Corrects startup type to Manual/Auto and starts `ClipSVC` instantly |
-| **0x80070422** | Service is disabled; unable to install | Windows Update or Store install services disabled by policy | Removes policy blocks and forces service startup types to Auto |
+| **0x80070422** | Service is disabled; unable to install | Windows Update or Store install services disabled by policy | Removes policy blocks and restores the required startup types (Manual/Auto) |
 | **0x80131500 / 0x80072EFD** | Store connection timeout / Retry page | Local proxy software running; UWP lacks loopback permission | Injects `CheckNetIsolation` exemption, resets proxy & ensures TLS 1.2/1.3 |
 | **0x8024402C** | Network connection timeout | DNS cache corruption or invalid WinHTTP proxy leftovers | Resets WinHTTP network stack to direct and flushes DNS |
 
@@ -102,7 +108,7 @@ flowchart TD
 ### Method 1: Local Double-Click
 1. Double-click **`一键修复微软商店.cmd`** on your Desktop or folder;
 2. Click **"Yes"** in the User Account Control (UAC) prompt;
-3. The script will perform automated self-adaptive repair within **10 ~ 15 seconds**;
+3. The script will perform automated self-adaptive repair within **10 ~ 15 seconds** (about **30 ~ 60 seconds** if it has to reinstall MSN News);
 4. Press **Enter** to open the Microsoft Store and click "Get updates" to verify.
 
 ### Method 2: Portable Deployment (Fix Other PCs)
@@ -112,8 +118,10 @@ This tool is completely self-contained in a single `.cmd` file. Copy `一键修�
 
 ## ⚙️ Technical Architecture
 
-- **Launcher Shell**: Written in 100% pure ASCII batch script (`.cmd`) with native UAC auto-elevation. Completely immune to `cmd.exe` multi-byte code page encoding corruption and cursor-doubling glitches.
-- **Core Engine**: Base64-encoded safe PowerShell script block with asynchronous error handling (`try-catch`) and non-blocking timeout mechanisms, guaranteeing smooth execution across all Windows editions.
+- **Launcher Shell**: A single `.cmd` saved in GBK (code page 936) with native UAC auto-elevation. The Chinese UI stays readable on Simplified Chinese Windows, while every command remains plain text and auditable.
+- **Core Engine**: Plain-text PowerShell calls with `try/catch` error handling and best-effort timeouts. No obfuscation, no Base64 payloads, no bundled binaries.
+- **Correct-User Store Install**: For the MSN News reinstall, the elevated repair hands the Store install back to the signed-in user through `explorer.exe`, so winget keeps the user's proxy/network context and installs into the right profile.
+- **Encoding Note**: The `.cmd` is GBK-encoded for reliable `cmd.exe` parsing on Chinese systems. On a non-Chinese Windows install the UI text may show as boxes, but the repair logic still runs. GitHub's web preview may show garbled characters for this file; the downloaded copy runs correctly.
 
 ---
 
@@ -132,6 +140,11 @@ No. The tool only clears transient store download queues, removes damaged tempor
 <details>
 <summary><b>Q3: I use proxy/VPN software. Will it conflict after running this tool?</b></summary>
 Not at all. This tool explicitly injects UWP Loopback Network Exemptions (`CheckNetIsolation`), allowing Microsoft Store to coexist seamlessly with local proxy software and eliminating the `0x80131500` error.
+</details>
+
+<details>
+<summary><b>Q4: The Store keeps offering an MSN News update that never installs. What does this tool do differently?</b></summary>
+That is usually <code>0x80073CFB</code>: the installed MSN News package and a half-staged bundle share the same identity but have different content, so Windows refuses the update. The tool detects this state, removes the broken package for every user, clears the corrupt staged folder, and reinstalls MSN News from the Store as the signed-in user. Other apps are left untouched.
 </details>
 
 <br/>
@@ -161,7 +174,7 @@ Not at all. This tool explicitly injects UWP Loopback Network Exemptions (`Check
 
 ## 🌟 核心特性
 
-- ⚡ **闪电修复（10 ~ 15 秒）**：精准定位应用商店下载队列与依赖链，秒级清空损坏缓存，不跑无意义的全盘扫描。
+- ⚡ **闪电修复（10 ~ 15 秒，触发 MSN 重装时约 30 ~ 60 秒）**：精准定位应用商店下载队列与依赖链，秒级清空损坏缓存，不跑无意义的全盘扫描。
 - 🖥️ **跨代智能自适应**：
   - 自动检测并识别 Windows 10（21H2/22H2 等）与 Windows 11（22H2/23H2/24H2 等）；
   - 自动识别硬件架构（AMD64 / ARM64）；
@@ -177,6 +190,10 @@ Not at all. This tool explicitly injects UWP Loopback Network Exemptions (`Check
   - `一级`：当前用户环境精准重注册；
   - `二级`：跨目录物理扫描 `WindowsApps` 实体清单补齐；
   - `三级`：调用系统原生 `wsreset.exe -i` 在线拉回缺失组件（即使商店被误删也能复原）。
+- 🩺 **MSN 资讯更新冲突修复（0x80073CFB）**：
+  - 自动识别损坏的暂存包，或只剩 1.x 空壳的 MSN 资讯安装；
+  - 删除所有用户的冲突旧包，清理 `WindowsApps` 中删不掉的损坏残留；
+  - 以当前登录用户身份从商店自动重装，保留正常的代理与网络环境。
 
 ---
 
@@ -195,8 +212,9 @@ flowchart TD
     Step5 --> Step6["6. 侦测并强制解锁卡在 DeploymentInProgress 的死锁包"]
     Step6 --> Step7["7. 重置 WinHTTP 代理 / 刷新 DNS / 注入 UWP 回环豁免"]
     Step7 --> Step8["8. 应用商店组件三级智能托底重新注册"]
+    Step8 --> Step9["9. 修复 MSN 资讯更新冲突 (0x80073CFB)"]
     
-    Step8 --> Report["输出健康诊断报告卡"]
+    Step9 --> Report["输出健康诊断报告卡"]
     Report --> Finish(["按回车一键启动微软应用商店测试"])
 ```
 
@@ -207,9 +225,10 @@ flowchart TD
 | 错误代码 | 典型触发场景 | 根本病灶原因 | 本工具针对性解决措施 |
 | :--- | :--- | :--- | :--- |
 | **0x80073CF0** / **0x80070002** | 下载进度卡在 0% 或报错中断 | 临时下载目录文件损坏、文件锁未释放 | 安全清空 `SoftwareDistribution\Download` 损坏包并重建目录 |
+| **0x80073CFB** | 应用更新反复失败，常见于 MSN 资讯 | 同标识的旧包或损坏暂存包冲突 | 自动删除所有用户的冲突包、清理暂存残留，并从商店重装 |
 | **0x80073D02** | 重新注册或更新商店自身时失败 | `AppInstaller` / 商店后台进程被 Windows 判定为“使用中” | 全量检索并强制终止关联进程树，释放安装器通道 |
 | **0x803F8001** | 应用提示许可证丢失或无法更新 | 客户端许可证服务 `ClipSVC` 异常或未运行 | 自动将 `ClipSVC` 设置为受控模式并即时唤醒 |
-| **0x80070422** | 提示服务已被禁用，无法安装 | 注册表策略阻断或更新核心服务被禁用 | 自动移除策略阻断键，并强制纠正服务启动类型为自动 |
+| **0x80070422** | 提示服务已被禁用，无法安装 | 注册表策略阻断或更新核心服务被禁用 | 自动移除策略阻断键，并恢复为手动/自动启动类型 |
 | **0x80131500** / **0x80072EFD** | 商店页面打不开、重试页面 | 开启了代理客户端，UWP 缺乏本机回环访问权限 | 注入 `CheckNetIsolation` 本地回环豁免，重置代理并激活 TLS 1.2/1.3 |
 | **0x8024402C** | 商店报网络连接超时 | DNS 污染或底层 WinHTTP 代理残留 | 执行底层网络协议栈复位并强制刷新系统 DNS 解析缓存 |
 
@@ -220,7 +239,7 @@ flowchart TD
 ### 1. 本机双击使用
 1. 直接双击运行桌面上或目录下的 **`一键修复微软商店.cmd`**；
 2. 在弹出的“用户账户控制 (UAC)”窗口中点击**“是”**；
-3. 控制台将在 **10 ~ 15 秒**内全自动完成系统检测与深度修复；
+3. 控制台将在 **10 ~ 15 秒**内全自动完成系统检测与深度修复（若需重装 MSN 资讯，约 **30 ~ 60 秒**）；
 4. 修复完成后根据提示按**回车键**，将自动打开微软应用商店进行下载测试。
 
 ### 2. 便携使用（拯救其他故障电脑）
@@ -230,8 +249,10 @@ flowchart TD
 
 ## ⚙️ 技术架构
 
-- **外壳引导层**：采用 100% 纯 ASCII 语法编写的 `.cmd` 引导器，内置原生 UAC 自提权机制，彻底避免 `cmd.exe` 在多语言代码页环境下的编码与特殊字符转义陷阱，解决光标步长错位乱码。
-- **核心执行层**：采用 Base64 打包的安全 PowerShell 逻辑，具备完善的异步异常捕获（`try-catch`）与超时防卡死设计，保证各环节在任何系统上均能顺畅退出。
+- **外壳引导层**：采用 GBK（代码页 936）编码的单文件 `.cmd`，内置原生 UAC 自提权机制。中文界面在简体中文 Windows 上稳定显示，所有命令均为明文，可直接审计。
+- **核心执行层**：明文 PowerShell 调用，配合 `try/catch` 异常捕获与尽力而为的超时控制；不使用 Base64 混淆，不捆绑任何二进制文件。
+- **正确的用户身份安装**：MSN 资讯重装时，提权进程通过 `explorer.exe` 把商店安装交还给当前登录用户，winget 因而保留用户的代理与网络环境，并安装到正确的用户配置中。
+- **编码说明**：`.cmd` 采用 GBK 编码，避免 `cmd.exe` 在 UTF-8 代码页下截断中文导致命令解析错误。在非中文 Windows 上界面可能显示为方块，但修复逻辑仍会正常执行；GitHub 网页预览该文件时也可能显示乱码，下载后运行不受影响。
 
 ---
 
@@ -250,6 +271,11 @@ flowchart TD
 <details>
 <summary><b>Q3: 我开启了网络加速/代理工具，修复后会不会冲突？</b></summary>
 不会。本工具特别加入了 UWP 本地回环网络豁免（Loopback Exempt），修复后微软商店不仅能直连，更能与各类代理软件完美共存，彻底告别 0x80131500 页面无法加载的问题。
+</details>
+
+<details>
+<summary><b>Q4: 商店里的 MSN 资讯一直提示更新却装不上，这个工具怎么处理？</b></summary>
+这通常是 <code>0x80073CFB</code>：已安装的 MSN 资讯包和下载到一半的暂存包标识相同但内容不同，Windows 因此拒绝更新。工具会自动识别这种状态，删除所有用户的损坏包、清理暂存残留，并以当前登录用户身份从商店重新安装 MSN 资讯；不会动其他应用。
 </details>
 
 ---
